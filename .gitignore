@@ -13,7 +13,6 @@ TestResults/
 
 # dist
 dist/
-dist-static/
 
 # globs
 Makefile.in
