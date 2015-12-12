@@ -21,6 +21,11 @@ namespace ProjectBowtie
 			Controls.Add (BtnExit);
 		}
 
+		public override void OnSceneSwitch () {
+			var game = UIController.Instance.Game;
+			game.Mouse.CursorVisible = true;
+		}
+
 		void LoadContent () {
 			var game = UIController.Instance.Game;
 			Background = game.Content.Load<Texture2D> ("background_menu.png");
