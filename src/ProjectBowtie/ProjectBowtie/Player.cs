@@ -8,6 +8,8 @@ namespace ProjectBowtie
 {
 	public class Player : IUpdatable, IDrawable2D
 	{
+		const float SpeedError = 1f;
+
 		Texture2D Crosshair;
 		SpriteSheet2D PlayerSprites;
 		Animator WalkAnimation;
@@ -17,9 +19,8 @@ namespace ProjectBowtie
 		Vector2 WalkTargetLocation;
 		float WalkSpeed;
 		float DashSpeed;
-		float SpeedError = 1f;
+		float TargetAngle;
 		float Rotation;
-
 		bool LeftButtonDown;
 
 		public Player () {
@@ -30,6 +31,7 @@ namespace ProjectBowtie
 			DashSpeed = 500f;
 			LeftButtonDown = false;
 			Rotation = 0;
+			TargetAngle = 0;
 			LoadContent ();
 		}
 
@@ -49,7 +51,7 @@ namespace ProjectBowtie
 			// Update movement
 			if (game.Mouse.IsInsideWindow ()) {
 				if (/*!LeftButtonDown &&*/ game.Mouse.IsButtonDown (MouseButton.Left)) {
-					WalkTargetLocation = new Vector2 (game.Mouse.X, game.Mouse.Y);
+					WalkTargetLocation = new Vector2 ((int)game.Mouse.X, (int)game.Mouse.Y);
 					LeftButtonDown = true;
 				} else if (LeftButtonDown && game.Mouse.IsButtonUp (MouseButton.Left))
 					LeftButtonDown = false;
@@ -61,24 +63,26 @@ namespace ProjectBowtie
 			float angleDeg = (180f / (float) Math.PI) * angleRad + 75;
 			Rotation = MathHelper.DegreesToRadians (angleDeg);
 
-			// Basic pathfinding
-			if (Math.Abs (WalkTargetLocation.Length - Position.Length) > float.Epsilon) {
+			// Advanced pathfinding
+			var optimizedPosition = new Vector2 ((int)Position.X, (int)Position.Y);
+			if (Math.Abs (WalkTargetLocation.Length - optimizedPosition.Length) > float.Epsilon) {
 				var currentX = Position.X;
 				var currentY = Position.Y;
 				var targetX = WalkTargetLocation.X;
 				var targetY = WalkTargetLocation.Y;
+				TargetAngle = (float) Math.Atan2 ((targetY - currentY), (targetX - currentX));
 				var moveX = true;
 				var moveY = true;
 				if (targetX + SpeedError < currentX - SpeedError)
-					currentX -= WalkSpeed * (float)time.Elapsed.TotalSeconds;
+					currentX -= Math.Abs (WalkSpeed * (float) Math.Cos (TargetAngle) * (float)time.Elapsed.TotalSeconds);
 				else if (targetX - SpeedError > currentX + SpeedError)
-					currentX += WalkSpeed * (float)time.Elapsed.TotalSeconds;
+					currentX += Math.Abs (WalkSpeed * (float) Math.Cos (TargetAngle) * (float)time.Elapsed.TotalSeconds);
 				else
 					moveX = false;
 				if (targetY + SpeedError < currentY - SpeedError)
-					currentY -= WalkSpeed * (float)time.Elapsed.TotalSeconds;
+					currentY -= Math.Abs ((WalkSpeed * (float) Math.Sin (TargetAngle)) * (float)time.Elapsed.TotalSeconds);
 				else if (targetY - SpeedError > currentY + SpeedError)
-					currentY += WalkSpeed * (float)time.Elapsed.TotalSeconds;
+					currentY += Math.Abs ((WalkSpeed * (float) Math.Sin (TargetAngle)) * (float)time.Elapsed.TotalSeconds);
 				else
 					moveY = false;
 				if (moveX || moveY)
