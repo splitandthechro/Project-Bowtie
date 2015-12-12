@@ -46,11 +46,23 @@
     <Reference Include="libnginz.Scripting.Python">
       <HintPath>..\..\..\..\nginz\bin\Debug\libnginz.Scripting.Python.dll</HintPath>
     </Reference>
+    <Reference Include="OpenTK">
+      <HintPath>..\..\..\..\nginz\opentk-build\OpenTK.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MainGame.cs" />
+    <Compile Include="Map.cs" />
+    <Compile Include="Wave.cs" />
+    <Compile Include="UIScenes\MainMenuScene.cs" />
+    <Compile Include="UIScenes\MainGameScene.cs" />
+    <Compile Include="Player.cs" />
+    <Compile Include="PlayerMovement.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="UIScenes\" />
+  </ItemGroup>
 </Project>
