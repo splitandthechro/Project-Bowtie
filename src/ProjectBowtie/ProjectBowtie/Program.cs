@@ -7,8 +7,8 @@ namespace ProjectBowtie
 	{
 		public static void Main (string[] args) {
 			var config = new GameConfiguration {
-				Width = 640,
-				Height = 480,
+				Width = 832,
+				Height = 624,
 				FixedFramerate = false,
 				Vsync = VsyncMode.Adaptive,
 				Fullscreen = false,

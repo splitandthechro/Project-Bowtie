@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using nginz;
 using OpenTK;
 using OpenTK.Graphics;
@@ -10,7 +13,22 @@ namespace ProjectBowtie
 	{
 		const float SpeedError = 1f;
 
+		public List<Rectangle> MapColliders;
+		public Rectangle Bounds {
+			get {
+				var playerRect = new Rectangle (
+					x: (int) currentX - (PlayerSprites.TileWidth / 2),
+					y: (int) currentY - (PlayerSprites.TileHeight / 2),
+					width: PlayerSprites.TileWidth,
+					height: PlayerSprites.TileHeight
+				);
+				playerRect.Inflate (-20, -20);
+				return playerRect;
+			}
+		}
+
 		Texture2D Crosshair;
+		Texture2D Collider;
 		SpriteSheet2D PlayerSprites;
 		Animator WalkAnimation;
 		Animator DashAnimation;
@@ -22,6 +40,8 @@ namespace ProjectBowtie
 		float TargetAngle;
 		float Rotation;
 		bool LeftButtonDown;
+		float currentX;
+		float currentY;
 
 		public Player () {
 			Movement = PlayerMovement.None;
@@ -32,6 +52,7 @@ namespace ProjectBowtie
 			LeftButtonDown = false;
 			Rotation = 0;
 			TargetAngle = 0;
+			MapColliders = new List<Rectangle> ();
 			LoadContent ();
 		}
 
@@ -39,9 +60,10 @@ namespace ProjectBowtie
 			var game = UIController.Instance.Game;
 			var playertex = game.Content.Load<Texture2D> ("player.png");
 			Crosshair = game.Content.Load<Texture2D> ("crosshair.png");
+			Collider = game.Content.Load<Texture2D> ("collider.png", TextureConfiguration.Nearest);
 			PlayerSprites = new SpriteSheet2D (playertex, 5, 1);
-			WalkAnimation = new Animator (PlayerSprites, 2, 3);
-			WalkAnimation.DurationInMilliseconds = 250;
+			WalkAnimation = new Animator (PlayerSprites, 2, 1);
+			WalkAnimation.DurationInMilliseconds = 250;	
 			DashAnimation = new Animator (PlayerSprites, 2, 3);
 		}
 
@@ -65,9 +87,9 @@ namespace ProjectBowtie
 
 			// Advanced pathfinding
 			var optimizedPosition = new Vector2 ((int)Position.X, (int)Position.Y);
+			currentX = Position.X;
+			currentY = Position.Y;
 			if (Math.Abs (WalkTargetLocation.Length - optimizedPosition.Length) > float.Epsilon) {
-				var currentX = Position.X;
-				var currentY = Position.Y;
 				var targetX = WalkTargetLocation.X;
 				var targetY = WalkTargetLocation.Y;
 				TargetAngle = (float) Math.Atan2 ((targetY - currentY), (targetX - currentX));
@@ -89,7 +111,8 @@ namespace ProjectBowtie
 					Movement = PlayerMovement.Walk;
 				else
 					Movement = PlayerMovement.None;
-				Position = new Vector2 (currentX, currentY);
+				if (MapColliders.All (collider => !collider.IntersectsWith (Bounds)))
+					Position = new Vector2 (currentX, currentY);
 			}
 
 			// Update animation positions
@@ -123,6 +146,9 @@ namespace ProjectBowtie
 				WalkAnimation.Draw (time, batch);
 				break;
 			}
+
+			foreach (var bounds in MapColliders)
+				batch.Draw (Collider, Collider.Bounds, bounds, Color4.White);
 
 			batch.Draw (Crosshair, new Vector2 (game.Mouse.X - 10, game.Mouse.Y - 10), Color4.White);
 		}

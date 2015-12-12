@@ -22,6 +22,10 @@ namespace ProjectBowtie
 			UIController.Instance.Bind (this);
 			UIController.Instance.LoadDefaultFonts ();
 
+			// Serialize the dummy map
+			Content.RegisterAssetHandler<Map> (typeof (MapHandler));
+			Content.Save<Map> (Map.Dummy, Map.Dummy.Name);
+
 			// Create scenes
 			Scene_MainMenu = new MainMenuScene ();
 			Scene_MainGame = new MainGameScene ();

@@ -48,6 +48,9 @@
     <Reference Include="OpenTK">
       <HintPath>..\..\..\..\nginz\opentk-build\OpenTK.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -59,9 +62,13 @@
     <Compile Include="UIScenes\MainGameScene.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerMovement.cs" />
+    <Compile Include="MapHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="UIScenes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

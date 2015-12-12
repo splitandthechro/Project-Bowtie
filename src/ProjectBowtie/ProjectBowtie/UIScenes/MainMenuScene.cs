@@ -69,7 +69,7 @@ namespace ProjectBowtie
 		}
 
 		public override void Draw (GameTime time, SpriteBatch batch) {
-			batch.Draw (Background, Vector2.Zero, Color4.White);
+			batch.Draw (Background, Background.Bounds, UIController.Instance.Game.Bounds, Color4.White);
 			base.Draw (time, batch);
 		}
 	}
