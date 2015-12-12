@@ -38,7 +38,7 @@ namespace ProjectBowtie
 			var playertex = game.Content.Load<Texture2D> ("player.png");
 			Crosshair = game.Content.Load<Texture2D> ("crosshair.png");
 			PlayerSprites = new SpriteSheet2D (playertex, 5, 1);
-			WalkAnimation = new Animator (PlayerSprites, 2, 1);
+			WalkAnimation = new Animator (PlayerSprites, 2, 3);
 			WalkAnimation.DurationInMilliseconds = 250;
 			DashAnimation = new Animator (PlayerSprites, 2, 3);
 		}
@@ -48,7 +48,7 @@ namespace ProjectBowtie
 
 			// Update movement
 			if (game.Mouse.IsInsideWindow ()) {
-				if (!LeftButtonDown && game.Mouse.IsButtonDown (MouseButton.Left)) {
+				if (/*!LeftButtonDown &&*/ game.Mouse.IsButtonDown (MouseButton.Left)) {
 					WalkTargetLocation = new Vector2 (game.Mouse.X, game.Mouse.Y);
 					LeftButtonDown = true;
 				} else if (LeftButtonDown && game.Mouse.IsButtonUp (MouseButton.Left))
@@ -58,7 +58,7 @@ namespace ProjectBowtie
 			// Calculate rotation based on mouse position
 			// The player should always face the cursor
 			float angleRad = (float) Math.Atan2 (game.Mouse.Y - Position.Y, game.Mouse.X - Position.X);
-			float angleDeg = (180f / (float) Math.PI) * angleRad;
+			float angleDeg = (180f / (float) Math.PI) * angleRad + 75;
 			Rotation = MathHelper.DegreesToRadians (angleDeg);
 
 			// Basic pathfinding
@@ -102,29 +102,23 @@ namespace ProjectBowtie
 		public void Draw (GameTime time, SpriteBatch batch) {
 			var game = UIController.Instance.Game;
 
-			batch.Draw (
-				texture: PlayerSprites.Texture,
-				sourceRect: PlayerSprites [0],
-				position: Position,
-				color: Color4.White,
-				scale: Vector2.One,
-				rotation: Rotation,
-				origin: new Vector2 (PlayerSprites [0].Width / 2f, PlayerSprites [0].Height / 2f),
-				depth: 0
-			);
-
-			/*
 			switch (Movement) {
 			case PlayerMovement.None:
 				batch.Draw (
-					PlayerSprites.Texture, PlayerSprites [0], Position, Color4.White, 1, 0, Rotation
+					texture: PlayerSprites.Texture,
+					sourceRect: PlayerSprites [0],
+					position: Position,
+					color: Color4.White,
+					scale: Vector2.One,
+					rotation: Rotation,
+					origin: new Vector2 (PlayerSprites [0].Width / 2f, PlayerSprites [0].Height / 2f),
+					depth: 0
 				);
 				break;
 			case PlayerMovement.Walk:
 				WalkAnimation.Draw (time, batch);
 				break;
 			}
-			*/
 
 			batch.Draw (Crosshair, new Vector2 (game.Mouse.X - 10, game.Mouse.Y - 10), Color4.White);
 		}
