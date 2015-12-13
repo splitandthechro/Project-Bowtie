@@ -10,6 +10,7 @@ namespace ProjectBowtie
 				Width = 832,
 				Height = 624,
 				FixedFramerate = false,
+				FixedWindow = true,
 				Vsync = VsyncMode.Adaptive,
 				Fullscreen = false,
 				WindowTitle = "Project Bowtie"

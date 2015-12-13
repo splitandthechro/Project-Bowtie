@@ -12,22 +12,27 @@ namespace ProjectBowtie
 		public float SpawnSpeed;
 		public List<EnemyConfiguration> EnemyTypes;
 
-		Random rng;
 		float spawnTimeDelta;
-		List<Enemy> enemies;
+		float spawnedCount;
+		readonly List<Enemy> enemies;
 
 		public Wave () {
 			SpawnCount = 0;
 			SpawnSpeed = 0;
 			spawnTimeDelta = 0;
+			spawnedCount = 0;
 			EnemyTypes = new List<EnemyConfiguration> ();
 			enemies = new List<Enemy> ();
-			rng = new Random ();
 		}
 
 		public Wave (int count, int speed) : this () {
 			SpawnCount = count;
 			SpawnSpeed = speed;
+		}
+
+		public void UpdateEnemyPathing (Vector2 PlayerPositionOrigin) {
+			for (var i = 0; i < enemies.Count; i++)
+				enemies [i].PlayerPositionOrigin = PlayerPositionOrigin;
 		}
 
 		public void AddEnemyType (EnemyConfiguration configuration) {
@@ -36,28 +41,32 @@ namespace ProjectBowtie
 		}
 
 		void SpawnRandomEnemy () {
-			var conf = EnemyTypes [rng.Next (0, EnemyTypes.Count)];
-			var left = rng.Next (0, 2) == 0;
-			var top = rng.Next (0, 2) == 0;
+			var conf = EnemyTypes [Randomizer.Next (0, EnemyTypes.Count)];
+			var left = Randomizer.Next (0, 2) == 0;
 			var pos = new Vector2 (
 				x: left
 				? -conf.Texture.Width
-				: UIController.Instance.Game.Bounds.Width,
-				y: top
-				? -conf.Texture.Height
-				: UIController.Instance.Game.Bounds.Height
+				: 832,
+				y: Randomizer.Next (-conf.Texture.Height, UIController.Instance.Game.Bounds.Height)
 			);
+			this.Log ("Spawning enemy of type '{0}' at position {1}", conf.Name, pos);
 			var enemy = new Enemy (conf, pos);
+			enemies.Add (enemy);
 		}
 
 		#region IUpdatable implementation
 
 		public void Update (GameTime time) {
-			spawnTimeDelta += (float) time.Elapsed.TotalSeconds;
-			if (spawnTimeDelta > 1f) {
-				SpawnRandomEnemy ();
-				spawnTimeDelta -= 1f;
+			if (SpawnCount > spawnedCount) {
+				spawnTimeDelta += (float)time.Elapsed.TotalSeconds;
+				if (spawnTimeDelta > 1f / SpawnSpeed) {
+					SpawnRandomEnemy ();
+					spawnedCount++;
+					spawnTimeDelta -= (1f / SpawnSpeed);
+				}
 			}
+			for (var i = 0; i < enemies.Count; i++)
+				enemies [i].Update (time);
 		}
 
 		#endregion
@@ -65,6 +74,8 @@ namespace ProjectBowtie
 		#region IDrawable2D implementation
 
 		public void Draw (GameTime time, SpriteBatch batch) {
+			for (var i = 0; i < enemies.Count; i++)
+				enemies [i].Draw (time, batch);
 		}
 
 		#endregion

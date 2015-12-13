@@ -1,51 +1,71 @@
 ﻿using System;
-using nginz;
+using System.Collections.Generic;
 using System.Drawing;
+using nginz;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace ProjectBowtie
 {
-	public class Enemy : IUpdatable, IDrawable2D
+	public class Enemy : MovementController, IUpdatable, IDrawable2D
 	{
+		public EnemyConfiguration Conf;
 		public Texture2D Texture;
-		public Vector2 Position;
-		public float Damage;
-		public float Speed;
+		public Vector2 PlayerPositionOrigin;
 
-		public Rectangle Bounds {
-			get {
-				var rect = new Rectangle (
-					x: (int) Position.X - (Texture.Width / 2),
-					y: (int) Position.Y - (Texture.Height / 2),
-					width: Texture.Width,
-					height: Texture.Height
-				);
-				rect.Inflate (-20, -20);
-				return rect;
-			}
-		}
-
-		public Enemy () {
-			Position = Vector2.Zero;
-		}
+		Random rng;
+		SpriteSheet2D Sprites;
+		Animator HitAnimation;
+		bool EnteringMap;
+		bool IsInsideMap;
+		Vector2 InitialMapTargetPoint;
 
 		public Enemy (EnemyConfiguration conf, Vector2 pos) {
+			Conf = conf;
 			Texture = conf.Texture;
 			Position = pos;
+			CurrentX = Position.X;
+			CurrentY = Position.Y;
+			Colliders = new List<Rectangle> ();
+			Sprites = new SpriteSheet2D (Texture, Conf.Frames, 1);
+			HitAnimation = new Animator (Sprites, Conf.AttackFrameCount, Conf.AttackFrameStart);
+			PlayerPositionOrigin = Vector2.Zero;
+			rng = new Random ();
+			IsInsideMap = false;
+			Speed = conf.Speed;
 		}
 
 		#region IUpdatable implementation
 
 		public void Update (GameTime time) {
+			if (!EnteringMap) {
+				InitialMapTargetPoint = GetRandomMapLocation ();
+				MoveTo (InitialMapTargetPoint);
+				EnteringMap = true;
+			}
+			if (EnteringMap) {
+				IsInsideMap |=
+					Math.Abs (Position.X - InitialMapTargetPoint.X) < float.Epsilon
+					&& Math.Abs (Position.Y - InitialMapTargetPoint.Y) < float.Epsilon;
+				if (!IsInsideMap) {
+					UpdatePathing (time);
+					return;
+				}
+			}
+			Console.WriteLine ("Enemy '{0}' reached target point!", Conf.Name);
 		}
 
 		#endregion
 
+		Vector2 GetRandomMapLocation () {
+			return new Vector2 (Randomizer.Next (32, 832 - Width - 32), Randomizer.Next (32, 624 - Height - 32));
+		}
+
 		#region IDrawable2D implementation
 
 		public void Draw (GameTime time, SpriteBatch batch) {
-			batch.Draw (Texture, Texture.Bounds, Position, Color4.White);
+			if (Texture	!= null)
+				batch.Draw (Texture, Texture.Bounds, Position, Color4.White);
 		}
 
 		#endregion

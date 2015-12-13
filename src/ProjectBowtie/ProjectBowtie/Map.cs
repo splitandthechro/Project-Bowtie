@@ -7,10 +7,11 @@ using nginz;
 using nginz.Common;
 using OpenTK;
 using OpenTK.Graphics;
+using System.Linq;
 
 namespace ProjectBowtie
 {
-	public class Map : IAsset, IDrawable2D, ICanLog
+	public class Map : IAsset, IUpdatable, IDrawable2D, ICanLog
 	{
 		public static Map Dummy;
 		static Map () {
@@ -25,18 +26,19 @@ namespace ProjectBowtie
 
 		[JsonIgnore]
 		public Texture2D Texture;
-
 		public string Name;
 		public List<Rectangle> Collisions;
 		public List<Wave> Waves;
-		public int CurrentWave;
+		public int WaveIndex;
+		public Wave ActiveWave;
+
 		EnemyRegister EnemyRegister;
 
 		public Map () {
 			Name = string.Empty;
 			Collisions = new List<Rectangle> ();
 			Waves = new List<Wave> ();
-			CurrentWave = 0;
+			WaveIndex = 0;
 			EnemyRegister = new EnemyRegister ();
 		}
 
@@ -44,11 +46,12 @@ namespace ProjectBowtie
 			Name = name;
 		}
 
-		public void LoadEnemies () {
-			foreach (var kvp in EnemyRegister.EnemyTypes) {
-				this.Log ("Loading enemy type: {0}", kvp.Key);
-				kvp.Value.LoadTexture ();
-			}
+		public void Initialize () {
+			ActiveWave = Waves [WaveIndex];
+		}
+
+		public void UpdateWaveEnemyPathing (Vector2 PlayerPositionOrigin) {
+			ActiveWave.UpdateEnemyPathing (PlayerPositionOrigin);
 		}
 
 		public void Save (string path) {
@@ -65,14 +68,23 @@ namespace ProjectBowtie
 			foreach (var collision in map.Collisions) {
 				map.Log ("Registered collider: {0}", collision);
 			}
-			map.LoadEnemies ();
+			map.Initialize ();
 			return map;
 		}
+
+		#region IUpdatable implementation
+
+		public void Update (GameTime time) {
+			ActiveWave.Update (time);
+		}
+
+		#endregion
 
 		#region IDrawable2D implementation
 
 		public void Draw (GameTime time, SpriteBatch batch) {
 			batch.Draw (Texture, Texture.Bounds, UIController.Instance.Game.Bounds, Color4.White);
+			ActiveWave.Draw (time, batch);
 		}
 
 		#endregion

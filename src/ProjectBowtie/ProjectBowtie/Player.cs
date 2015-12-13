@@ -9,50 +9,31 @@ using OpenTK.Input;
 
 namespace ProjectBowtie
 {
-	public class Player : IUpdatable, IDrawable2D
+	public class Player : MovementController, IUpdatable, IDrawable2D
 	{
-		const float SpeedError = 1f;
-
-		public List<Rectangle> MapColliders;
-		public Rectangle Bounds {
-			get {
-				var playerRect = new Rectangle (
-					x: (int) currentX - (PlayerSprites.TileWidth / 2),
-					y: (int) currentY - (PlayerSprites.TileHeight / 2),
-					width: PlayerSprites.TileWidth,
-					height: PlayerSprites.TileHeight
-				);
-				playerRect.Inflate (-20, -20);
-				return playerRect;
-			}
-		}
-
 		Texture2D Crosshair;
 		Texture2D Collider;
+		Texture2D DashEffect;
 		SpriteSheet2D PlayerSprites;
 		Animator WalkAnimation;
 		Animator DashAnimation;
 		PlayerMovement Movement;
-		Vector2 Position;
-		Vector2 WalkTargetLocation;
-		float WalkSpeed;
-		float DashSpeed;
-		float TargetAngle;
-		float Rotation;
-		bool LeftButtonDown;
-		float currentX;
-		float currentY;
+		bool RightButtonDown;
+		bool Dashing;
+		bool DashCharging;
+		const float DashTimeout = 225;
+		const float DashChargeTreshold = 150;
+		float DashDelta;
+		float DashCharge;
+		bool RenderDashEffect;
+		bool WasDashing;
 
 		public Player () {
 			Movement = PlayerMovement.None;
 			Position = Vector2.Zero;
-			WalkTargetLocation = Vector2.Zero;
-			WalkSpeed = 200f;
-			DashSpeed = 500f;
-			LeftButtonDown = false;
-			Rotation = 0;
-			TargetAngle = 0;
-			MapColliders = new List<Rectangle> ();
+			MoveTo (Position);
+			Speed = 200f;
+			Colliders = new List<Rectangle> ();
 			LoadContent ();
 		}
 
@@ -61,10 +42,14 @@ namespace ProjectBowtie
 			var playertex = game.Content.Load<Texture2D> ("player.png");
 			Crosshair = game.Content.Load<Texture2D> ("crosshair.png");
 			Collider = game.Content.Load<Texture2D> ("collider.png", TextureConfiguration.Nearest);
+			DashEffect = game.Content.Load<Texture2D> ("dash_effect.png");
 			PlayerSprites = new SpriteSheet2D (playertex, 5, 1);
 			WalkAnimation = new Animator (PlayerSprites, 2, 1);
 			WalkAnimation.DurationInMilliseconds = 250;	
 			DashAnimation = new Animator (PlayerSprites, 2, 3);
+			Width = PlayerSprites.TileWidth;
+			Height = PlayerSprites.TileHeight;
+			Dashing = false;
 		}
 
 		public void Update (GameTime time) {
@@ -72,11 +57,20 @@ namespace ProjectBowtie
 
 			// Update movement
 			if (game.Mouse.IsInsideWindow ()) {
-				if (/*!LeftButtonDown &&*/ game.Mouse.IsButtonDown (MouseButton.Left)) {
-					WalkTargetLocation = new Vector2 ((int)game.Mouse.X, (int)game.Mouse.Y);
-					LeftButtonDown = true;
-				} else if (LeftButtonDown && game.Mouse.IsButtonUp (MouseButton.Left))
-					LeftButtonDown = false;
+
+				// Movement
+				if (!Dashing && game.Mouse.IsButtonDown (MouseButton.Left)) {
+					MoveTo (new Vector2 (game.Mouse.X, game.Mouse.Y));
+				}
+
+				// Dashing
+				if (!RightButtonDown && game.Mouse.IsButtonDown (MouseButton.Right)) {
+					RenderDashEffect = true;
+					RightButtonDown = true;
+					DashCharging = true;
+				} else if (RightButtonDown && game.Mouse.IsButtonUp (MouseButton.Right)) {
+					RightButtonDown = false;
+				}
 			}
 
 			// Calculate rotation based on mouse position
@@ -85,37 +79,39 @@ namespace ProjectBowtie
 			float angleDeg = ((180f / (float) Math.PI) * angleRad) + 90;
 			Rotation = MathHelper.DegreesToRadians (angleDeg);
 
-			// Advanced pathfinding
-			var optimizedPosition = new Vector2 ((int)Position.X, (int)Position.Y);
-			currentX = Position.X;
-			currentY = Position.Y;
-			if (Math.Abs (WalkTargetLocation.Length - optimizedPosition.Length) > float.Epsilon) {
-				var targetX = WalkTargetLocation.X;
-				var targetY = WalkTargetLocation.Y;
-				TargetAngle = (float) Math.Atan2 ((targetY - currentY), (targetX - currentX));
-				var moveX = true;
-				var moveY = true;
-				if (targetX + SpeedError < currentX - SpeedError)
-					currentX -= Math.Abs (WalkSpeed * (float) Math.Cos (TargetAngle) * (float)time.Elapsed.TotalSeconds);
-				else if (targetX - SpeedError > currentX + SpeedError)
-					currentX += Math.Abs (WalkSpeed * (float) Math.Cos (TargetAngle) * (float)time.Elapsed.TotalSeconds);
-				else
-					moveX = false;
-				if (targetY + SpeedError < currentY - SpeedError)
-					currentY -= Math.Abs ((WalkSpeed * (float) Math.Sin (TargetAngle)) * (float)time.Elapsed.TotalSeconds);
-				else if (targetY - SpeedError > currentY + SpeedError)
-					currentY += Math.Abs ((WalkSpeed * (float) Math.Sin (TargetAngle)) * (float)time.Elapsed.TotalSeconds);
-				else
-					moveY = false;
-				if (moveX || moveY)
-					Movement = PlayerMovement.Walk;
-				else
-					Movement = PlayerMovement.None;
-				if (MapColliders.All (collider => !collider.IntersectsWith (Bounds)))
-					Position = new Vector2 (currentX, currentY);
-				else
-					Movement = PlayerMovement.None;
+			// Update dashing
+			Speed = Dashing ? 1000f : 200f;
+			if (DashCharging) {
+				DashCharge += (float)time.Elapsed.TotalMilliseconds;
+				if (DashCharge > DashChargeTreshold) {
+					DashCharge = 0;
+					DashCharging = false;
+					RenderDashEffect = false;
+					Dashing = true;
+					DisableCollision = true;
+					MoveTo (new Vector2 (game.Mouse.X, game.Mouse.Y));
+				}
 			}
+			if (Dashing) {
+				DashDelta += (float) time.Elapsed.TotalMilliseconds;
+				if (DashDelta > DashTimeout) {
+					DashDelta = 0;
+					Dashing = false;
+					WasDashing = true;
+					MoveTo (Position);
+				}
+			}
+
+			// Update pathing
+			var collides = CollidesWithAny ();
+			if (!collides && WasDashing) {
+				DisableCollision = false;
+				WasDashing = false;
+			}
+			if (UpdatePathing (time) && !CollidesWithAny ()) {
+				Movement = Dashing ? PlayerMovement.Dash : PlayerMovement.Walk;
+			} else
+				Movement = PlayerMovement.None;
 
 			// Update animation positions
 			WalkAnimation.Position = Position;
@@ -131,6 +127,16 @@ namespace ProjectBowtie
 		public void Draw (GameTime time, SpriteBatch batch) {
 			var game = UIController.Instance.Game;
 
+			if (RenderDashEffect)
+				batch.Draw (
+					texture: DashEffect,
+					sourceRect: DashEffect.Bounds,
+					position: new Vector2 (Position.X - ((DashEffect.Width * 2) / 2f), Position.Y - ((DashEffect.Height * 2) / 2f)),
+					color: new Color4 (1, 1, 1, (DashCharge / DashChargeTreshold) / 2f),
+					scale: new Vector2 (2, 2),
+					depth: 0
+				);
+
 			switch (Movement) {
 			case PlayerMovement.None:
 				batch.Draw (
@@ -140,17 +146,23 @@ namespace ProjectBowtie
 					color: Color4.White,
 					scale: Vector2.One,
 					rotation: Rotation,
-					origin: new Vector2 (PlayerSprites [0].Width / 2f, PlayerSprites [0].Height / 2f),
+					origin: new Vector2 (Width / 2f, Height / 2f),
 					depth: 0
 				);
 				break;
 			case PlayerMovement.Walk:
 				WalkAnimation.Draw (time, batch);
 				break;
+			case PlayerMovement.Dash:
+				DashAnimation.Draw (time, batch);
+				break;
 			}
 
-			//foreach (var bounds in MapColliders)
-			//	batch.Draw (Collider, Collider.Bounds, bounds, Color4.White);
+			if (DevSettings.VisualizeCollision) {
+				batch.Draw (Collider, Collider.Bounds, CollisionBounds, Color4.White);
+				foreach (var bounds in Colliders)
+					batch.Draw (Collider, Collider.Bounds, bounds, Color4.White);
+			}
 
 			batch.Draw (Crosshair, new Vector2 (game.Mouse.X - 10, game.Mouse.Y - 10), Color4.White);
 		}

@@ -11,25 +11,27 @@ namespace ProjectBowtie
 		readonly List<Map> Maps;
 
 		Map ActiveMap;
-		Enemy TestEnemy;
+		DevConsole DevConsole;
 
 		public MainGameScene () : base ("main_game") {
 			Player = new Player ();
-			TestEnemy = new Enemy ();
 			Maps = new List<Map> ();
+			DevConsole = new DevConsole ();
+			DevConsole.RegisterCommand ("VCollOn", () => DevSettings.VisualizeCollision = true);
+			DevConsole.RegisterCommand ("VCollOff", () => DevSettings.VisualizeCollision = false);
 			LoadMaps ();
 			MakeMapActive ("forest");
 		}
 
 		public void MakeMapActive (string map) {
 			ActiveMap = Maps.FirstOrDefault (m => m.Name == map);
-			Player.MapColliders = ActiveMap.Collisions;
+			Player.Colliders = ActiveMap.Collisions;
 		}
 
 		public void LoadMaps () {
 			var game = UIController.Instance.Game;
-			Maps.Add (game.Content.Load<Map> ("forest"));
-			TestEnemy.Texture = game.Content.Load<Texture2D> ("slime.png");
+			var map = game.Content.Load<Map> ("forest");
+			Maps.Add (map);
 		}
 
 		public override void OnSceneSwitch () {
@@ -42,7 +44,8 @@ namespace ProjectBowtie
 			if (game.Keyboard.IsKeyTyped (OpenTK.Input.Key.Escape))
 				UIController.Instance.SwitchScene ("main_menu");
 			Player.Update (time);
-			TestEnemy.Update (time);
+			ActiveMap.Update (time);
+			DevConsole.Update (time);
 			base.Update (time);
 		}
 
@@ -50,7 +53,7 @@ namespace ProjectBowtie
 			if (ActiveMap != default (Map))
 				ActiveMap.Draw (time, batch);
 			Player.Draw (time, batch);
-			TestEnemy.Draw (time, batch);
+			DevConsole.Draw (time, batch);
 			base.Draw (time, batch);
 		}
 	}

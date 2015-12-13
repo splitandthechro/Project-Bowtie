@@ -67,6 +67,10 @@
     <Compile Include="WaveSpawnConfiguration.cs" />
     <Compile Include="EnemyRegister.cs" />
     <Compile Include="EnemyConfiguration.cs" />
+    <Compile Include="MovementController.cs" />
+    <Compile Include="Randomizer.cs" />
+    <Compile Include="DevConsole.cs" />
+    <Compile Include="DevSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
