@@ -14,10 +14,15 @@
           "LifePoints": 100.0,
           "Strength": 20.0,
           "Speed": 40.0,
+          "Frames": 0,
+          "IdleFrame": 0,
+          "AttackFrameStart": 0,
+          "AttackFrameCount": 0,
           "TexturePath": "slime.png"
         }
       ]
     }
   ],
-  "CurrentWave": 0
+  "WaveIndex": 0,
+  "ActiveWave": null
 }

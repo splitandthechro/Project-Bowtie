@@ -13,18 +13,45 @@
     ],
     "Waves": [
         {
-            "SpawnCount": 1,
-            "SpawnSpeed": 1,
+            "SpawnCount": 10,
+            "SpawnSpeed": 0.5,
             "EnemyTypes": [
                 {
                     "Name": "slime",
                     "LifePoints": 10.0,
                     "Strength": 2.0,
                     "Speed": 40.0,
+                    "Frames": 1,
+                    "IdleFrame": 0,
+                    "AttackFrameStart": 0,
+                    "AttackFrameCount": 0,
                     "TexturePath": "slime.png"
+                },
+                {
+                    "Name": "slime_alt",
+                    "LifePoints": 10.0,
+                    "Strength": 2.0,
+                    "Speed": 40.0,
+                    "Frames": 1,
+                    "IdleFrame": 0,
+                    "AttackFrameStart": 0,
+                    "AttackFrameCount": 0,
+                    "TexturePath": "slime_alt.png"
+                },
+                {
+                    "Name": "enemy1",
+                    "LifePoints": 10.0,
+                    "Strength": 4.0,
+                    "Speed": 35.0,
+                    "Frames": 4,
+                    "IdleFrame": 2,
+                    "AttackFrameStart": 3,
+                    "AttackFrameCount": 1,
+                    "TexturePath": "enemy1.png"
                 }
             ]
         }
       ],
-    "CurrentWave": 0
+    "WaveIndex": 0,
+    "ActiveWave": null
 }

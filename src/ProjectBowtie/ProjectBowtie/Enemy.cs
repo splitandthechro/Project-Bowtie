@@ -65,7 +65,7 @@ namespace ProjectBowtie
 
 		public void Draw (GameTime time, SpriteBatch batch) {
 			if (Texture	!= null)
-				batch.Draw (Texture, Texture.Bounds, Position, Color4.White);
+				batch.Draw (Texture, Sprites [Conf.IdleFrame], Position, Color4.White);
 		}
 
 		#endregion
