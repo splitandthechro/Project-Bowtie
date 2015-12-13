@@ -17,27 +17,38 @@ namespace ProjectBowtie
 			Dummy = new Map ("dummy");
 			Dummy.Collisions.Add (new Rectangle (0, 0, 20, 20));
 			Dummy.Collisions.Add (new Rectangle (13, 37, 13, 37));
+			Dummy.EnemyRegister.AddEnemyType ("slime", new EnemyConfiguration { LifePoints = 100, Speed = 40, Strength = 20, TexturePath = "slime.png" });
+			var wave = new Wave (10, 50);
+			wave.AddEnemyType (Dummy.EnemyRegister ["slime"]);
+			Dummy.Waves.Add (wave);
 		}
 
 		[JsonIgnore]
 		public Texture2D Texture;
 
-		[JsonIgnore]
-		public Vector2 Position;
-
 		public string Name;
-		public float X { get { return Position.X; } set { Position.X = value; } }
-		public float Y { get { return Position.Y; } set { Position.Y = value; } }
 		public List<Rectangle> Collisions;
+		public List<Wave> Waves;
+		public int CurrentWave;
+		EnemyRegister EnemyRegister;
 
 		public Map () {
 			Name = string.Empty;
-			Position = Vector2.Zero;
 			Collisions = new List<Rectangle> ();
+			Waves = new List<Wave> ();
+			CurrentWave = 0;
+			EnemyRegister = new EnemyRegister ();
 		}
 
 		public Map (string name) : this () {
 			Name = name;
+		}
+
+		public void LoadEnemies () {
+			foreach (var kvp in EnemyRegister.EnemyTypes) {
+				this.Log ("Loading enemy type: {0}", kvp.Key);
+				kvp.Value.LoadTexture ();
+			}
 		}
 
 		public void Save (string path) {
@@ -54,6 +65,7 @@ namespace ProjectBowtie
 			foreach (var collision in map.Collisions) {
 				map.Log ("Registered collider: {0}", collision);
 			}
+			map.LoadEnemies ();
 			return map;
 		}
 

@@ -63,6 +63,10 @@
     <Compile Include="Player.cs" />
     <Compile Include="PlayerMovement.cs" />
     <Compile Include="MapHandler.cs" />
+    <Compile Include="Enemy.cs" />
+    <Compile Include="WaveSpawnConfiguration.cs" />
+    <Compile Include="EnemyRegister.cs" />
+    <Compile Include="EnemyConfiguration.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -82,7 +82,7 @@ namespace ProjectBowtie
 			// Calculate rotation based on mouse position
 			// The player should always face the cursor
 			float angleRad = (float) Math.Atan2 (game.Mouse.Y - Position.Y, game.Mouse.X - Position.X);
-			float angleDeg = (180f / (float) Math.PI) * angleRad + 75;
+			float angleDeg = ((180f / (float) Math.PI) * angleRad) + 90;
 			Rotation = MathHelper.DegreesToRadians (angleDeg);
 
 			// Advanced pathfinding
@@ -113,6 +113,8 @@ namespace ProjectBowtie
 					Movement = PlayerMovement.None;
 				if (MapColliders.All (collider => !collider.IntersectsWith (Bounds)))
 					Position = new Vector2 (currentX, currentY);
+				else
+					Movement = PlayerMovement.None;
 			}
 
 			// Update animation positions
@@ -147,8 +149,8 @@ namespace ProjectBowtie
 				break;
 			}
 
-			foreach (var bounds in MapColliders)
-				batch.Draw (Collider, Collider.Bounds, bounds, Color4.White);
+			//foreach (var bounds in MapColliders)
+			//	batch.Draw (Collider, Collider.Bounds, bounds, Color4.White);
 
 			batch.Draw (Crosshair, new Vector2 (game.Mouse.X - 10, game.Mouse.Y - 10), Color4.White);
 		}
