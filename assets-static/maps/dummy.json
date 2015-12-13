@@ -1,0 +1,23 @@
+{
+  "Name": "dummy",
+  "Collisions": [
+    "0, 0, 20, 20",
+    "13, 37, 13, 37"
+  ],
+  "Waves": [
+    {
+      "SpawnCount": 10,
+      "SpawnSpeed": 50.0,
+      "EnemyTypes": [
+        {
+          "Name": "slime",
+          "LifePoints": 100.0,
+          "Strength": 20.0,
+          "Speed": 40.0,
+          "TexturePath": "slime.png"
+        }
+      ]
+    }
+  ],
+  "CurrentWave": 0
+}

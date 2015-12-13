@@ -30,9 +30,9 @@ namespace ProjectBowtie
 			Position = Vector2.Zero;
 		}
 
-		public Enemy (Texture2D texture, Vector2 position) {
-			Texture = texture;
-			Position = position;
+		public Enemy (EnemyConfiguration conf, Vector2 pos) {
+			Texture = conf.Texture;
+			Position = pos;
 		}
 
 		#region IUpdatable implementation

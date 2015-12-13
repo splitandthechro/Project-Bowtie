@@ -1,0 +1,30 @@
+{
+    "Name": "forest",
+    "Collisions": [
+        "143, 117, 40, 40",
+        "269, 255, 40, 40",
+        "204, 369, 40, 40",
+        "524, 337, 40, 40",
+        "569, 511, 40, 40",
+        "550, 166, 40, 40",
+        "317, 524, 36, 32",
+        "667, 242, 38, 21",
+        "376, 0, 61, 258"
+    ],
+    "Waves": [
+        {
+            "SpawnCount": 1,
+            "SpawnSpeed": 1,
+            "EnemyTypes": [
+                {
+                    "Name": "slime",
+                    "LifePoints": 10.0,
+                    "Strength": 2.0,
+                    "Speed": 40.0,
+                    "TexturePath": "slime.png"
+                }
+            ]
+        }
+      ],
+    "CurrentWave": 0
+}
