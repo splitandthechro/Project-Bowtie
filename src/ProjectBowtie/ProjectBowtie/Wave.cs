@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using nginz.Common;
 using nginz;
 using OpenTK;
+using System.Linq;
 
 namespace ProjectBowtie
 {
@@ -11,9 +12,10 @@ namespace ProjectBowtie
 		public int SpawnCount;
 		public float SpawnSpeed;
 		public List<EnemyConfiguration> EnemyTypes;
+		public bool WaveEnded;
 
 		float spawnTimeDelta;
-		float spawnedCount;
+		int spawnedCount;
 		readonly List<Enemy> enemies;
 
 		public Wave () {
@@ -23,6 +25,7 @@ namespace ProjectBowtie
 			spawnedCount = 0;
 			EnemyTypes = new List<EnemyConfiguration> ();
 			enemies = new List<Enemy> ();
+			WaveEnded = false;
 		}
 
 		public Wave (int count, int speed) : this () {
@@ -57,6 +60,8 @@ namespace ProjectBowtie
 		#region IUpdatable implementation
 
 		public void Update (GameTime time) {
+			for (var i = 0; i < EnemyTypes.Count; i++)
+				EnemyTypes [i].LoadTexture ();
 			if (SpawnCount > spawnedCount) {
 				spawnTimeDelta += (float)time.Elapsed.TotalSeconds;
 				if (spawnTimeDelta > 1f / SpawnSpeed) {
@@ -65,8 +70,10 @@ namespace ProjectBowtie
 					spawnTimeDelta -= (1f / SpawnSpeed);
 				}
 			}
+			WaveEnded |= spawnedCount == SpawnCount && enemies.All (e => e.Defeated);
 			for (var i = 0; i < enemies.Count; i++)
-				enemies [i].Update (time);
+				if (!enemies [i].Defeated)
+					enemies [i].Update (time);
 		}
 
 		#endregion
@@ -75,7 +82,8 @@ namespace ProjectBowtie
 
 		public void Draw (GameTime time, SpriteBatch batch) {
 			for (var i = 0; i < enemies.Count; i++)
-				enemies [i].Draw (time, batch);
+				if (!enemies [i].Defeated)
+					enemies [i].Draw (time, batch);
 		}
 
 		#endregion

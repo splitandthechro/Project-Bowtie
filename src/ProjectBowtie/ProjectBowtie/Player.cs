@@ -12,17 +12,19 @@ namespace ProjectBowtie
 	public class Player : MovementController, IUpdatable, IDrawable2D
 	{
 		Texture2D Crosshair;
-		Texture2D Collider;
 		Texture2D DashEffect;
 		SpriteSheet2D PlayerSprites;
 		Animator WalkAnimation;
 		Animator DashAnimation;
 		PlayerMovement Movement;
+		public EnemyConfiguration Conf;
 		bool RightButtonDown;
-		bool Dashing;
+		public bool Dashing;
 		bool DashCharging;
-		const float DashTimeout = 225;
+		const float DashDuration = 250;
 		const float DashChargeTreshold = 150;
+		const float WalkSpeed = 200f;
+		const float DashSpeed = 750f;
 		float DashDelta;
 		float DashCharge;
 		bool RenderDashEffect;
@@ -32,8 +34,9 @@ namespace ProjectBowtie
 			Movement = PlayerMovement.None;
 			Position = Vector2.Zero;
 			MoveTo (Position);
-			Speed = 200f;
+			Speed = WalkSpeed;
 			Colliders = new List<Rectangle> ();
+			Conf = new EnemyConfiguration ();
 			LoadContent ();
 		}
 
@@ -41,7 +44,6 @@ namespace ProjectBowtie
 			var game = UIController.Instance.Game;
 			var playertex = game.Content.Load<Texture2D> ("player.png");
 			Crosshair = game.Content.Load<Texture2D> ("crosshair.png");
-			Collider = game.Content.Load<Texture2D> ("collider.png", TextureConfiguration.Nearest);
 			DashEffect = game.Content.Load<Texture2D> ("dash_effect.png");
 			PlayerSprites = new SpriteSheet2D (playertex, 5, 1);
 			WalkAnimation = new Animator (PlayerSprites, 2, 1);
@@ -61,7 +63,8 @@ namespace ProjectBowtie
 				// Movement
 				if (!Dashing && game.Mouse.IsButtonDown (MouseButton.Left)) {
 					MoveTo (new Vector2 (game.Mouse.X, game.Mouse.Y));
-				}
+				} else if (!Dashing && game.Mouse.IsButtonUp (MouseButton.Left))
+					MoveTo (Position);
 
 				// Dashing
 				if (!RightButtonDown && game.Mouse.IsButtonDown (MouseButton.Right)) {
@@ -80,7 +83,7 @@ namespace ProjectBowtie
 			Rotation = MathHelper.DegreesToRadians (angleDeg);
 
 			// Update dashing
-			Speed = Dashing ? 1000f : 200f;
+			Speed = Dashing ? DashSpeed : WalkSpeed;
 			if (DashCharging) {
 				DashCharge += (float)time.Elapsed.TotalMilliseconds;
 				if (DashCharge > DashChargeTreshold) {
@@ -88,13 +91,14 @@ namespace ProjectBowtie
 					DashCharging = false;
 					RenderDashEffect = false;
 					Dashing = true;
+					GlobalObjects.Shaker.FastShake ();
 					DisableCollision = true;
 					MoveTo (new Vector2 (game.Mouse.X, game.Mouse.Y));
 				}
 			}
 			if (Dashing) {
 				DashDelta += (float) time.Elapsed.TotalMilliseconds;
-				if (DashDelta > DashTimeout) {
+				if (DashDelta > DashDuration) {
 					DashDelta = 0;
 					Dashing = false;
 					WasDashing = true;
@@ -159,9 +163,16 @@ namespace ProjectBowtie
 			}
 
 			if (DevSettings.VisualizeCollision) {
-				batch.Draw (Collider, Collider.Bounds, CollisionBounds, Color4.White);
+				batch.Draw (DevSettings.CollisionTexture, DevSettings.CollisionTexture.Bounds, CollisionBounds, Color4.White);
 				foreach (var bounds in Colliders)
-					batch.Draw (Collider, Collider.Bounds, bounds, Color4.White);
+					batch.Draw (DevSettings.CollisionTexture, DevSettings.CollisionTexture.Bounds, bounds, Color4.White);
+			}
+
+			if (DevSettings.VisualizeCoordinates) {
+				var font = UIController.Instance.Fonts ["Roboto Regular"];
+				font.DrawString (batch,
+					string.Format ("X: {0} Y: {1}", (int) CurrentX, (int) CurrentY),
+					new Vector2 (CurrentX + (Width / 2) + 16, CurrentY - (Height / 2)), Color4.White);
 			}
 
 			batch.Draw (Crosshair, new Vector2 (game.Mouse.X - 10, game.Mouse.Y - 10), Color4.White);

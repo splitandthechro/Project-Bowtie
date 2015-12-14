@@ -13,14 +13,32 @@ namespace ProjectBowtie
 		public int Height;
 		public Rectangle CollisionBounds {
 			get {
-				var rect = new Rectangle (
-					x: (int) CurrentX - (Width / 2),
-					y: (int) CurrentY - (Height / 2),
+				// Bounds at 0 deg rotation
+				var rect0 = new Rectangle (
+					x: (int) (CurrentX - (Width / 2f)),
+					y: (int) (CurrentY - (Height / 2f)),
 					width: Width,
 					height: Height
 				);
-				rect.Inflate (-20, -20);
-				return rect;
+				// Bounds at 90 deg rotation
+				var rect90 = new Rectangle (
+					x: (int) (CurrentX - (Height / 2f)),
+					y: (int) (CurrentY - (Width / 2f)),
+					width: Height,
+					height: Width
+				);
+				// 50% blended bounds
+				var blend = new Rectangle (
+					x: (rect0.X / 2) + (rect90.X / 2),
+					y: (rect0.Y / 2) + (rect90.Y / 2),
+					width: (rect0.Width / 2) + (rect90.Width / 2),
+					height: (rect0.Height / 2) + (rect90.Height / 2)
+				);
+				// Shrink factor
+				var shrinkFactor = (int) (((Width / 2f) + (Height / 2f)) / 6f);
+				// Shrink rectangle by shrink
+				blend.Inflate (-shrinkFactor, -shrinkFactor);
+				return blend;
 			}
 		}
 

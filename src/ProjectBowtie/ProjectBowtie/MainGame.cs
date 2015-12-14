@@ -7,6 +7,7 @@ namespace ProjectBowtie
 {
 	public class MainGame : Game
 	{
+		Camera OrthoCamera;
 		MainMenuScene Scene_MainMenu;
 		MainGameScene Scene_MainGame;
 
@@ -22,8 +23,9 @@ namespace ProjectBowtie
 			UIController.Instance.Bind (this);
 			UIController.Instance.LoadDefaultFonts ();
 
-			// Serialize the dummy map
+			// Register asset handlers
 			Content.RegisterAssetHandler<Map> (typeof (MapHandler));
+			Content.RegisterAssetHandler<EnemyConfiguration> (typeof(EnemyConfigurationHandler));
 			Content.Save<Map> (Map.Dummy, Map.Dummy.Name);
 
 			// Create scenes
@@ -32,6 +34,11 @@ namespace ProjectBowtie
 
 			// Set active scene
 			Scene_MainMenu.MakeActive ();
+
+			// Create orthographic camera
+			OrthoCamera = new Camera (60f, Resolution, 0, 16, type: ProjectionType.Orthographic);
+			GlobalObjects.OrthoCamera = OrthoCamera;
+			GlobalObjects.Shaker = new CameraShake (OrthoCamera);
 			base.Initialize ();
 		}
 
@@ -48,8 +55,11 @@ namespace ProjectBowtie
 			GL.ClearColor (Color4.Black);
 			GL.Clear (ClearBufferMask.ColorBufferBit);
 
+			// Update the camera shaker
+			GlobalObjects.Shaker.Update (time);
+
 			// Begin sprite batching
-			SpriteBatch.Begin ();
+			SpriteBatch.Begin (OrthoCamera);
 
 			// Draw the UI
 			UIController.Instance.Draw (time, SpriteBatch);

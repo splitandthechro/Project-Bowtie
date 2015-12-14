@@ -1,0 +1,5 @@
+{
+    "Name": "player",
+    "BaseDamage": 10.0,
+    "Health": 200.0,
+}

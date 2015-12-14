@@ -9,17 +9,22 @@ namespace ProjectBowtie
 	{
 		readonly Player Player;
 		readonly List<Map> Maps;
+		readonly DevConsole DevConsole;
 
 		Map ActiveMap;
-		DevConsole DevConsole;
 
 		public MainGameScene () : base ("main_game") {
 			Player = new Player ();
+			GlobalObjects.Player = Player;
 			Maps = new List<Map> ();
 			DevConsole = new DevConsole ();
-			DevConsole.RegisterCommand ("VCollOn", () => DevSettings.VisualizeCollision = true);
-			DevConsole.RegisterCommand ("VCollOff", () => DevSettings.VisualizeCollision = false);
-			LoadMaps ();
+			DevConsole.RegisterCommand ("bounds 1", () => DevSettings.VisualizeCollision = true);
+			DevConsole.RegisterCommand ("bounds 0", () => DevSettings.VisualizeCollision = false);
+			DevConsole.RegisterCommand ("prox 1", () => DevSettings.VisualizeProximity = true);
+			DevConsole.RegisterCommand ("prox 0", () => DevSettings.VisualizeProximity = false);
+			DevConsole.RegisterCommand ("coords 1", () => DevSettings.VisualizeCoordinates = true);
+			DevConsole.RegisterCommand ("coords 0", () => DevSettings.VisualizeCoordinates = false);
+			LoadContent ();
 			MakeMapActive ("forest");
 		}
 
@@ -28,9 +33,11 @@ namespace ProjectBowtie
 			Player.Colliders = ActiveMap.Collisions;
 		}
 
-		public void LoadMaps () {
+		public void LoadContent () {
 			var game = UIController.Instance.Game;
 			var map = game.Content.Load<Map> ("forest");
+			DevSettings.CollisionTexture = game.Content.Load<Texture2D> ("collider.png");
+			Player.Conf = game.Content.Load<EnemyConfiguration> ("player");
 			Maps.Add (map);
 		}
 
@@ -45,6 +52,7 @@ namespace ProjectBowtie
 				UIController.Instance.SwitchScene ("main_menu");
 			Player.Update (time);
 			ActiveMap.Update (time);
+			ActiveMap.UpdateWaveEnemyPathing (new OpenTK.Vector2 (Player.CollisionBounds.X, Player.CollisionBounds.Y));
 			DevConsole.Update (time);
 			base.Update (time);
 		}

@@ -71,6 +71,11 @@
     <Compile Include="Randomizer.cs" />
     <Compile Include="DevConsole.cs" />
     <Compile Include="DevSettings.cs" />
+    <Compile Include="GlobalObjects.cs" />
+    <Compile Include="CameraShake.cs" />
+    <Compile Include="LivingEntity.cs" />
+    <Compile Include="EnemyConfigurationHandler.cs" />
+    <Compile Include="StatCalculator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

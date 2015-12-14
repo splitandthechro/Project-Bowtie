@@ -18,7 +18,7 @@ namespace ProjectBowtie
 			Dummy = new Map ("dummy");
 			Dummy.Collisions.Add (new Rectangle (0, 0, 20, 20));
 			Dummy.Collisions.Add (new Rectangle (13, 37, 13, 37));
-			Dummy.EnemyRegister.AddEnemyType ("slime", new EnemyConfiguration { LifePoints = 100, Speed = 40, Strength = 20, TexturePath = "slime.png" });
+			Dummy.EnemyRegister.AddEnemyType ("slime", new EnemyConfiguration { Health = 100, Speed = 40, BaseDamage = 20, TexturePath = "slime.png" });
 			var wave = new Wave (10, 50);
 			wave.AddEnemyType (Dummy.EnemyRegister ["slime"]);
 			Dummy.Waves.Add (wave);
@@ -76,6 +76,13 @@ namespace ProjectBowtie
 
 		public void Update (GameTime time) {
 			ActiveWave.Update (time);
+			if (ActiveWave.WaveEnded) {
+				WaveIndex++;
+				if (WaveIndex < Waves.Count) {
+					this.Log ("Loading next wave");
+					ActiveWave = Waves [WaveIndex];
+				}
+			}
 		}
 
 		#endregion
