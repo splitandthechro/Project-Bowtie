@@ -18,7 +18,6 @@ namespace ProjectBowtie
 			CreateLayout ();
 			CreateLogic ();
 			Controls.Add (BtnNewGame);
-			Controls.Add (BtnLoadGame);
 			Controls.Add (BtnExit);
 		}
 
@@ -30,17 +29,17 @@ namespace ProjectBowtie
 		void LoadContent () {
 			var game = UIController.Instance.Game;
 			Background = game.Content.Load<Texture2D> ("background_menu.png");
-			//ThemeMusic = game.Content.Load<Sound> ("dash.wav");
-			//game.SoundManager.LoopMusic = true;
-			//game.SoundManager.MusicVolume = 0.25f;
-			//game.SoundManager.PlayMusic (ThemeMusic);
+			ThemeMusic = game.Content.Load<Sound> ("menu_theme.ogg");
+			game.SoundManager.LoopMusic = false;
+			game.SoundManager.PlayMusic (ThemeMusic);
+			game.SoundManager.MusicVolume = 0.01f;
 		}
 
 		void CreateLayout () {
 			var game = UIController.Instance.Game;
 			BtnNewGame = new Button (300, 30, "Roboto Regular") {
 				X = (game.Bounds.Width / 2) - 150,
-				Y = (game.Bounds.Height / 2) - 30 - 35,
+				Y = (game.Bounds.Height / 2) - 30 - 30,
 				FontSize = 14.25f,
 				ForegroundColor = Color4.White,
 				HighlightForegroundColor = Color4.LightGray,
@@ -58,7 +57,7 @@ namespace ProjectBowtie
 			};
 			BtnExit = new Button (300, 30, "Roboto Regular") {
 				X = (game.Bounds.Width / 2) - 150,
-				Y = (game.Bounds.Height / 2) - 30 + 35,
+				Y = (game.Bounds.Height / 2) - 30,
 				FontSize = 14.25f,
 				ForegroundColor = Color4.White,
 				HighlightForegroundColor = Color4.LightGray,

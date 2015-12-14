@@ -83,7 +83,8 @@ namespace ProjectBowtie
 					this.Log ("Loading next wave");
 					ActiveWave = Waves [WaveIndex];
 					ActiveWave.Index = WaveIndex + 1;
-				}
+				} else
+					UIController.Instance.SwitchScene ("after_match_screen");
 			}
 		}
 

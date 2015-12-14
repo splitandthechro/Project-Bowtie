@@ -6,7 +6,7 @@ using System.IO;
 
 namespace ProjectBowtie
 {
-	public class EnemyConfiguration : IAsset, ICanLog
+	public class EnemyConfiguration : IAsset, ICanLog, ICloneable
 	{
 		[JsonIgnore]
 		public Texture2D Texture {
@@ -28,10 +28,37 @@ namespace ProjectBowtie
 		public int IdleFrame;
 		public int AttackFrameStart;
 		public int AttackFrameCount;
+		public float AttackAnimationDuration;
 		public int WalkFrameStart;
 		public int WalkFrameCount;
+		public float WalkAnimationDuration;
 
 		public string TexturePath;
+
+		#region ICloneable implementation
+
+		public object Clone () {
+			var conf = new EnemyConfiguration () {
+				Name = Name,
+				Speed = 1f * Speed,
+				AttackSpeed = 1f * AttackSpeed,
+				BaseDamage = 1f * BaseDamage,
+				DamageMultiplicator = 1f * DamageMultiplicator,
+				Health = 1f * Health,
+				Frames = 1 * Frames,
+				IdleFrame = 1 * IdleFrame,
+				AttackFrameStart = 1 * AttackFrameStart,
+				AttackFrameCount = 1 * AttackFrameCount,
+				AttackAnimationDuration = 1 * AttackAnimationDuration,
+				WalkFrameStart = 1 * WalkFrameStart,
+				WalkFrameCount = 1 * WalkFrameCount,
+				WalkAnimationDuration = 1 * WalkAnimationDuration,
+				TexturePath = TexturePath
+			};
+			return conf;
+		}
+
+		#endregion
 
 		public EnemyConfiguration () {
 			Speed = 0;

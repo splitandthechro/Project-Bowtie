@@ -15,14 +15,17 @@ namespace ProjectBowtie
 		public Vector2 PlayerPositionOrigin;
 		public bool Defeated;
 
-		Random rng;
 		SpriteSheet2D Sprites;
 		Animator HitAnimation;
+		Animator WalkAnimation;
+		EnemyMovement Movement;
 		bool EnteringMap;
 		bool IsInsideMap;
 		bool GotHitByDash;
 		bool Attacked;
 		float AttackDelta;
+		float AttackAnimationDelta;
+		const float AttackAnimationTimeout = 200f;
 		Vector2 InitialMapTargetPoint;
 
 		public Enemy (EnemyConfiguration conf, Vector2 pos) {
@@ -36,8 +39,9 @@ namespace ProjectBowtie
 			Width = Sprites.TileWidth;
 			Height = Sprites.TileHeight;
 			HitAnimation = new Animator (Sprites, Conf.AttackFrameCount, Conf.AttackFrameStart);
+			WalkAnimation = new Animator (Sprites, Conf.WalkFrameCount, Conf.WalkFrameStart);
 			PlayerPositionOrigin = Vector2.Zero;
-			rng = new Random ();
+			Movement = EnemyMovement.Idle;
 			IsInsideMap = false;
 			Defeated = false;
 			Speed = conf.Speed;
@@ -50,6 +54,8 @@ namespace ProjectBowtie
 
 			// Initial target destination
 			if (!EnteringMap) {
+				HitAnimation.DurationInMilliseconds = Conf.AttackAnimationDuration;
+				WalkAnimation.DurationInMilliseconds = Conf.WalkAnimationDuration;
 				InitialMapTargetPoint = GetOptimalStartingLocation ();
 				MoveTo (InitialMapTargetPoint);
 				EnteringMap = true;
@@ -77,8 +83,9 @@ namespace ProjectBowtie
 			else if (PlayerInCloseProximity () && !GotHitByDash) {
 				if (!Attacked) {
 					// Shake violently
-					GlobalObjects.Shaker.Shake (2f + (MathHelper.Clamp (200f - GlobalObjects.Player.Conf.Health, 0, 50)), 100f, 2f);
+					GlobalObjects.Shaker.Shake (2f + (MathHelper.Clamp ((200f - GlobalObjects.Player.Conf.Health) / 2, 0, 50)), 100f, 2f);
 					Conf.Attack (GlobalObjects.Player.Conf);
+					AttackAnimationDelta = AttackAnimationTimeout;
 					Attacked = true;
 					AttackDelta = 0;
 				}
@@ -88,7 +95,20 @@ namespace ProjectBowtie
 			Attacked &= AttackDelta < Conf.AttackSpeed * 1000f;
 
 			// Update pathing till the last move is done
-			if (UpdatePathing (time))
+			bool updatedPathing;
+			if (updatedPathing = UpdatePathing (time)) {
+				Movement = EnemyMovement.Walk;
+				WalkAnimation.Position = Position;
+				WalkAnimation.Update (time);
+				HitAnimation.Position = Position;
+				HitAnimation.Update (time);
+			}
+			Movement = EnemyMovement.Idle;
+			if (AttackAnimationDelta > float.Epsilon) {
+				AttackAnimationDelta -= (float)time.Elapsed.TotalMilliseconds;
+				Movement = EnemyMovement.Attack;
+			}
+			if (updatedPathing)
 				return;
 
 			// Basic AI
@@ -147,22 +167,31 @@ namespace ProjectBowtie
 				: 32;
 			vec.Y = Position.Y;
 			return vec;
-			// return new Vector2 (Randomizer.Next (32, 832 - Width - 32), Randomizer.Next (32, 624 - Height - 32));
 		}
 
 		#region IDrawable2D implementation
 
 		public void Draw (GameTime time, SpriteBatch batch) {
-			batch.Draw (
-				texture: Sprites.Texture,
-				sourceRect: Sprites [Conf.IdleFrame],
-				position: Position,
-				color: Color4.White,
-				scale: Vector2.One,
-				rotation: Rotation,
-				origin: new Vector2 (Width / 2f, Height / 2f),
-				depth: 0
-			);
+			switch (Movement) {
+			case EnemyMovement.Idle:
+				batch.Draw (
+					texture: Sprites.Texture,
+					sourceRect: Sprites [Conf.IdleFrame],
+					position: Position,
+					color: Color4.White,
+					scale: Vector2.One,
+					rotation: Rotation,
+					origin: new Vector2 (Width / 2f, Height / 2f),
+					depth: 0
+				);
+				break;
+			case EnemyMovement.Walk:
+				WalkAnimation.Draw (time, batch);
+				break;
+			case EnemyMovement.Attack:
+				HitAnimation.Draw (time, batch);
+				break;
+			}
 			if (DevSettings.VisualizeCollision)
 				batch.Draw (DevSettings.CollisionTexture, DevSettings.CollisionTexture.Bounds, CollisionBounds, Color4.White);
 			if (DevSettings.VisualizeCoordinates) {

@@ -31,6 +31,7 @@ namespace ProjectBowtie
 			// Create scenes
 			Scene_MainMenu = new MainMenuScene ();
 			Scene_MainGame = new MainGameScene ();
+			var dummy = new AfterMatchScreen ();
 
 			// Set active scene
 			Scene_MainMenu.MakeActive ();

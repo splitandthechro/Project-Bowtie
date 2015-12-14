@@ -20,13 +20,17 @@
                     "Name": "slime",
                     "BaseDamage": 10.0,
                     "DamageMultiplicator": 1.0,
-                    "Health": 20,
+                    "Health": 10,
                     "Speed": 75.0,
                     "AttackSpeed": 0.5,
-                    "Frames": 1,
+                    "Frames": 3,
                     "IdleFrame": 0,
-                    "AttackFrameStart": 0,
-                    "AttackFrameCount": 0,
+                    "WalkFrameStart": 0,
+                    "WalkFrameCount": 2,
+                    "AttackFrameStart": 2,
+                    "AttackFrameCount": 1,
+                    "WalkAnimationDuration": 500,
+                    "AttackAnimationDuration": 250,
                     "TexturePath": "slime.png"
                 }
             ],
@@ -40,22 +44,24 @@
                     "Name": "slime",
                     "BaseDamage": 15.0,
                     "DamageMultiplicator": 1.0,
-                    "Health": 20,
+                    "Health": 10,
                     "Speed": 100.0,
                     "AttackSpeed": 1.0,
-                    "Frames": 1,
+                    "Frames": 3,
                     "IdleFrame": 0,
                     "WalkFrameStart": 0,
-                    "WalkFrameCount": 1,
-                    "AttackFrameStart": 0,
+                    "WalkFrameCount": 2,
+                    "AttackFrameStart": 2,
                     "AttackFrameCount": 1,
+                    "WalkAnimationDuration": 500,
+                    "AttackAnimationDuration": 250,
                     "TexturePath": "slime.png"
                 },
                 {
                     "Name": "slime_alt",
                     "BaseDamage": 15.0,
                     "DamageMultiplicator": 1.0,
-                    "Health": 20,
+                    "Health": 10,
                     "Speed": 100.0,
                     "AttackSpeed": 1.0,
                     "Frames": 1,
@@ -64,13 +70,15 @@
                     "WalkFrameCount": 1,
                     "AttackFrameStart": 0,
                     "AttackFrameCount": 1,
+                    "WalkAnimationDuration": 500,
+                    "AttackAnimationDuration": 250,
                     "TexturePath": "slime_alt.png"
                 },
                 {
                     "Name": "enemy1",
-                    "BaseDamage": 10.0,
+                    "BaseDamage": 15.0,
                     "DamageMultiplicator": 1.0,
-                    "Health": 50,
+                    "Health": 20,
                     "Speed": 100.0,
                     "AttackSpeed": 1.0,
                     "Frames": 5,
@@ -79,10 +87,77 @@
                     "WalkFrameCount": 2,
                     "AttackFrameStart": 3,
                     "AttackFrameCount": 2,
+                    "WalkAnimationDuration": 500,
+                    "AttackAnimationDuration": 250,
                     "TexturePath": "enemy1.png"
                 }
             ],
-            "Message": "Now ain't that a surprise..."
+            "Message": "Wow, you made it!"
+        },
+        {
+            "SpawnCount": 50,
+            "SpawnSpeed": 1,
+            "EnemyTypes": [
+                {
+                    "Name": "enemy1",
+                    "BaseDamage": 20.0,
+                    "DamageMultiplicator": 1.0,
+                    "Health": 20,
+                    "Speed": 90.0,
+                    "AttackSpeed": 1.0,
+                    "Frames": 5,
+                    "IdleFrame": 2,
+                    "WalkFrameStart": 0,
+                    "WalkFrameCount": 2,
+                    "WalkAnimationDuration": 500,
+                    "AttackAnimationDuration": 250,
+                    "AttackFrameStart": 3,
+                    "AttackFrameCount": 2,
+                    "TexturePath": "enemy1.png"
+                },
+                {
+                    "Name": "fireslime",
+                    "BaseDamage": 25.0,
+                    "DamageMultiplicator": 1.0,
+                    "Health": 20,
+                    "Speed": 50.0,
+                    "AttackSpeed": 1.0,
+                    "Frames": 3,
+                    "IdleFrame": 0,
+                    "WalkFrameStart": 0,
+                    "WalkFrameCount": 2,
+                    "AttackFrameStart": 2,
+                    "AttackFrameCount": 1,
+                    "WalkAnimationDuration": 500,
+                    "AttackAnimationDuration": 250,
+                    "TexturePath": "fireslime.png"
+                }
+            ],
+            "Message": "Have fun with this one.."
+        },
+        {
+            "SpawnCount": 1,
+            "SpawnSpeed": 1,
+            "EnemyTypes": [
+                {
+                    "Name": "slimeboss",
+                    "BaseDamage": 10.0,
+                    "DamageMultiplicator": 1.0,
+                    "Health": 100,
+                    "Speed": 75.0,
+                    "AttackSpeed": 0.5,
+                    "Frames": 5,
+                    "IdleFrame": 0,
+                    "WalkFrameStart": 0,
+                    "WalkFrameCount": 2,
+                    "AttackFrameStart": 2,
+                    "AttackFrameCount": 3,
+                    "WalkAnimationDuration": 500,
+                    "AttackAnimationDuration": 300,
+                    "TexturePath": "slimeboss.png"
+                }
+            ],
+            "Message": "Prepare to get rekt"
         }
       ],
     "WaveIndex": 0,

@@ -63,7 +63,7 @@ namespace ProjectBowtie
 				y: Randomizer.Next (-conf.Texture.Height, UIController.Instance.Game.Bounds.Height)
 			);
 			this.Log ("Spawning enemy of type '{0}' at position {1}", conf.Name, pos);
-			var enemy = new Enemy (conf, pos);
+			var enemy = new Enemy (conf.Clone () as EnemyConfiguration, pos);
 			enemies.Add (enemy);
 		}
 

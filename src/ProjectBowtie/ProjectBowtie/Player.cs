@@ -21,7 +21,7 @@ namespace ProjectBowtie
 		bool RightButtonDown;
 		public bool Dashing;
 		bool DashCharging;
-		const float DashDuration = 250;
+		const float DashDuration = 350;
 		const float DashChargeTreshold = 150;
 		const float WalkSpeed = 200f;
 		const float DashSpeed = 750f;
@@ -56,6 +56,9 @@ namespace ProjectBowtie
 
 		public void Update (GameTime time) {
 			var game = UIController.Instance.Game;
+
+			if (Conf.Health <= 0)
+				UIController.Instance.SwitchScene ("after_match_screen");
 
 			// Update movement
 			if (game.Mouse.IsInsideWindow ()) {
@@ -168,14 +171,16 @@ namespace ProjectBowtie
 					batch.Draw (DevSettings.CollisionTexture, DevSettings.CollisionTexture.Bounds, bounds, Color4.White);
 			}
 
+			var font = UIController.Instance.Fonts ["Roboto Regular"];
+			var textTargetVector = new Vector2 (CurrentX + (Width / 2) + 16, CurrentY - (Height / 2));
 			if (DevSettings.VisualizeCoordinates) {
-				var font = UIController.Instance.Fonts ["Roboto Regular"];
 				font.DrawString (batch,
 					string.Format ("X: {0} Y: {1}", (int) CurrentX, (int) CurrentY),
-					new Vector2 (CurrentX + (Width / 2) + 16, CurrentY - (Height / 2)), Color4.White);
+					textTargetVector, Color4.White);
 			}
 
 			batch.Draw (Crosshair, new Vector2 (game.Mouse.X - 10, game.Mouse.Y - 10), Color4.White);
+			font.DrawString (batch, string.Format ("Health: {0}", (int)Conf.Health), textTargetVector, Color4.White);
 		}
 	}
 }

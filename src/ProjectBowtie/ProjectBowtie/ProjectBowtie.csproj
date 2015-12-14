@@ -4,7 +4,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{28323AB9-A0A8-4CC2-AE65-9C781FF0A9A2}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>ProjectBowtie</RootNamespace>
     <AssemblyName>ProjectBowtie</AssemblyName>
   </PropertyGroup>
@@ -35,15 +35,6 @@
     </Reference>
     <Reference Include="libnginz.Common">
       <HintPath>..\..\..\..\nginz\bin\Debug\libnginz.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="libnginz.Interop.FreeType">
-      <HintPath>..\..\..\..\nginz\bin\Debug\libnginz.Interop.FreeType.dll</HintPath>
-    </Reference>
-    <Reference Include="libnginz.Interop.StbImage">
-      <HintPath>..\..\..\..\nginz\bin\Debug\libnginz.Interop.StbImage.dll</HintPath>
-    </Reference>
-    <Reference Include="libnginz.Scripting.Python">
-      <HintPath>..\..\..\..\nginz\bin\Debug\libnginz.Scripting.Python.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK">
       <HintPath>..\..\..\..\nginz\opentk-build\OpenTK.dll</HintPath>
@@ -76,7 +67,8 @@
     <Compile Include="LivingEntity.cs" />
     <Compile Include="EnemyConfigurationHandler.cs" />
     <Compile Include="StatCalculator.cs" />
-    <Compile Include="UIScenes\DeathScreen.cs" />
+    <Compile Include="EnemyMovement.cs" />
+    <Compile Include="UIScenes\AfterMatchScreen.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
