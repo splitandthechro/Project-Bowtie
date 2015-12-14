@@ -91,7 +91,7 @@ namespace ProjectBowtie
 					DashCharging = false;
 					RenderDashEffect = false;
 					Dashing = true;
-					GlobalObjects.Shaker.FastShake ();
+					GlobalObjects.Shaker.Shake (1, 50, 2);
 					DisableCollision = true;
 					MoveTo (new Vector2 (game.Mouse.X, game.Mouse.Y));
 				}

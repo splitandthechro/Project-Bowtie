@@ -21,7 +21,8 @@ namespace ProjectBowtie
 		bool EnteringMap;
 		bool IsInsideMap;
 		bool GotHitByDash;
-		float AttackCooldown;
+		bool Attacked;
+		float AttackDelta;
 		Vector2 InitialMapTargetPoint;
 
 		public Enemy (EnemyConfiguration conf, Vector2 pos) {
@@ -45,10 +46,11 @@ namespace ProjectBowtie
 		#region IUpdatable implementation
 
 		public void Update (GameTime time) {
+			var game = UIController.Instance.Game;
 
 			// Initial target destination
 			if (!EnteringMap) {
-				InitialMapTargetPoint = GetRandomMapLocation ();
+				InitialMapTargetPoint = GetOptimalStartingLocation ();
 				MoveTo (InitialMapTargetPoint);
 				EnteringMap = true;
 				return;
@@ -63,24 +65,27 @@ namespace ProjectBowtie
 
 			GotHitByDash &= GlobalObjects.Player.Dashing;
 
-			// Check if the entity is in close proximity to the player
-			if (PlayerInCloseProximity ()) {
+			if (PlayerInCloseProximity () && !GotHitByDash && GlobalObjects.Player.Dashing) {
+				GlobalObjects.Shaker.IntenseShake ();
+				GlobalObjects.Player.Conf.Attack (Conf);
+				Defeated |= Conf.Health < 0;
+				if (Defeated)
+					this.Log ("'{0}' was defeated", Conf.Name);
+				GotHitByDash = true;
+			}
 
-				// Check if the player is dashing
-				if (!GotHitByDash && GlobalObjects.Player.Dashing) {
-					GlobalObjects.Shaker.IntenseShake ();
-					GlobalObjects.Player.Conf.Attack (Conf);
-					Defeated |= Conf.Health < 0;
-					if (Defeated)
-						this.Log ("'{0}' was defeated", Conf.Name);
-					GotHitByDash = true;
-				}
-
-				// Attempt to attack
-				else {
-					// Attack ();
+			else if (PlayerInCloseProximity () && !GotHitByDash) {
+				if (!Attacked) {
+					// Shake violently
+					GlobalObjects.Shaker.Shake (2f + (MathHelper.Clamp (200f - GlobalObjects.Player.Conf.Health, 0, 50)), 100f, 2f);
+					Conf.Attack (GlobalObjects.Player.Conf);
+					Attacked = true;
+					AttackDelta = 0;
 				}
 			}
+
+			AttackDelta += (float) time.Elapsed.TotalMilliseconds;
+			Attacked &= AttackDelta < Conf.AttackSpeed * 1000f;
 
 			// Update pathing till the last move is done
 			if (UpdatePathing (time))
@@ -111,6 +116,7 @@ namespace ProjectBowtie
 				break;
 			case 4:
 			case 5:
+			case 6:
 				// Move towards the player
 				var targetX = Randomizer.Next (0, maxdistance);
 				var targetY = Randomizer.Next (0, maxdistance);
@@ -125,14 +131,23 @@ namespace ProjectBowtie
 
 		#endregion
 
-		bool PlayerInCloseProximity () {
+		bool PlayerInCloseProximity (int inflateX = 0, int inflateY = 0) {
 			var bigPlayerBounds = GlobalObjects.Player.CollisionBounds;
-			bigPlayerBounds.Inflate (Width, Height);
+			if (inflateX != 0 || inflateY != 0)
+				bigPlayerBounds.Inflate (Width, Height);
 			return bigPlayerBounds.IntersectsWith (CollisionBounds);
 		}
 
-		Vector2 GetRandomMapLocation () {
-			return new Vector2 (Randomizer.Next (32, 832 - Width - 32), Randomizer.Next (32, 624 - Height - 32));
+		Vector2 GetOptimalStartingLocation () {
+			var vec = new Vector2 ();
+			vec.X = Position.X < 0
+				? 32
+				: Position.X >= 832
+				? 832 - Width - 32
+				: 32;
+			vec.Y = Position.Y;
+			return vec;
+			// return new Vector2 (Randomizer.Next (32, 832 - Width - 32), Randomizer.Next (32, 624 - Height - 32));
 		}
 
 		#region IDrawable2D implementation

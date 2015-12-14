@@ -7,6 +7,7 @@ namespace ProjectBowtie
 {
 	public class MainMenuScene : UIScene
 	{
+		Sound ThemeMusic;
 		Texture2D Background;
 		Button BtnNewGame;
 		Button BtnLoadGame;
@@ -29,6 +30,10 @@ namespace ProjectBowtie
 		void LoadContent () {
 			var game = UIController.Instance.Game;
 			Background = game.Content.Load<Texture2D> ("background_menu.png");
+			//ThemeMusic = game.Content.Load<Sound> ("dash.wav");
+			//game.SoundManager.LoopMusic = true;
+			//game.SoundManager.MusicVolume = 0.25f;
+			//game.SoundManager.PlayMusic (ThemeMusic);
 		}
 
 		void CreateLayout () {

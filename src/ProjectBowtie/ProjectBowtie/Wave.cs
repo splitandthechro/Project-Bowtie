@@ -4,15 +4,23 @@ using nginz.Common;
 using nginz;
 using OpenTK;
 using System.Linq;
+using OpenTK.Graphics;
 
 namespace ProjectBowtie
 {
 	public class Wave : ICanLog, IUpdatable, IDrawable2D
 	{
+		public int Index;
 		public int SpawnCount;
 		public float SpawnSpeed;
 		public List<EnemyConfiguration> EnemyTypes;
 		public bool WaveEnded;
+		public bool AnnouncementEnded;
+		public float AnnouncementTimeout = 6f;
+		public float AnnouncementDelta;
+		public string Message;
+
+		Font Font;
 
 		float spawnTimeDelta;
 		int spawnedCount;
@@ -26,6 +34,8 @@ namespace ProjectBowtie
 			EnemyTypes = new List<EnemyConfiguration> ();
 			enemies = new List<Enemy> ();
 			WaveEnded = false;
+			Message = string.Empty;
+			Font = UIController.Instance.Fonts ["Roboto Regular"];
 		}
 
 		public Wave (int count, int speed) : this () {
@@ -60,6 +70,11 @@ namespace ProjectBowtie
 		#region IUpdatable implementation
 
 		public void Update (GameTime time) {
+			if (!AnnouncementEnded) {
+				AnnouncementDelta += (float) time.Elapsed.TotalSeconds;
+				AnnouncementEnded |= AnnouncementDelta > AnnouncementTimeout;
+				return;
+			}
 			for (var i = 0; i < EnemyTypes.Count; i++)
 				EnemyTypes [i].LoadTexture ();
 			if (SpawnCount > spawnedCount) {
@@ -81,6 +96,18 @@ namespace ProjectBowtie
 		#region IDrawable2D implementation
 
 		public void Draw (GameTime time, SpriteBatch batch) {
+			if (!AnnouncementEnded) {
+				var str = string.Format ("Wave {0} incoming: {1}", Index, Message);
+				var measurement = Font.MeasureString (str);
+				var vec = new Vector2 ((832f / 2f) - (measurement.X / 2f), (624f / 2f) - (measurement.Y / 2f));
+				Color4 color = Color4.White;
+				if (AnnouncementDelta < 2f)
+					color.A = AnnouncementDelta / 2;
+				else if (AnnouncementDelta > 4f)
+					color.A = 1f - (AnnouncementDelta - 4) / 2;
+				Font.DrawString (batch, str, vec, color);
+				return;
+			}
 			for (var i = 0; i < enemies.Count; i++)
 				if (!enemies [i].Defeated)
 					enemies [i].Draw (time, batch);

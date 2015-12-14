@@ -13,45 +13,36 @@
     ],
     "Waves": [
         {
-            "SpawnCount": 20,
-            "SpawnSpeed": 0.25,
+            "SpawnCount": 5,
+            "SpawnSpeed": 0.5,
             "EnemyTypes": [
                 {
                     "Name": "slime",
                     "BaseDamage": 10.0,
                     "DamageMultiplicator": 1.0,
                     "Health": 20,
-                    "Speed": 100.0,
+                    "Speed": 75.0,
+                    "AttackSpeed": 0.5,
                     "Frames": 1,
                     "IdleFrame": 0,
                     "AttackFrameStart": 0,
                     "AttackFrameCount": 0,
                     "TexturePath": "slime.png"
-                },
-                {
-                    "Name": "slime_alt",
-                    "BaseDamage": 10.0,
-                    "DamageMultiplicator": 1.0,
-                    "Health": 20,
-                    "Speed": 100.0,
-                    "Frames": 1,
-                    "IdleFrame": 0,
-                    "AttackFrameStart": 0,
-                    "AttackFrameCount": 0,
-                    "TexturePath": "slime_alt.png"
                 }
-            ]
+            ],
+            "Message": "Free kills."
         },
         {
-            "SpawnCount": 50,
-            "SpawnSpeed": 0.3,
+            "SpawnCount": 20,
+            "SpawnSpeed": 1,
             "EnemyTypes": [
                 {
                     "Name": "slime",
-                    "BaseDamage": 10.0,
+                    "BaseDamage": 15.0,
                     "DamageMultiplicator": 1.0,
                     "Health": 20,
                     "Speed": 100.0,
+                    "AttackSpeed": 1.0,
                     "Frames": 1,
                     "IdleFrame": 0,
                     "WalkFrameStart": 0,
@@ -62,10 +53,11 @@
                 },
                 {
                     "Name": "slime_alt",
-                    "BaseDamage": 10.0,
+                    "BaseDamage": 15.0,
                     "DamageMultiplicator": 1.0,
                     "Health": 20,
                     "Speed": 100.0,
+                    "AttackSpeed": 1.0,
                     "Frames": 1,
                     "IdleFrame": 0,
                     "WalkFrameStart": 0,
@@ -80,6 +72,7 @@
                     "DamageMultiplicator": 1.0,
                     "Health": 50,
                     "Speed": 100.0,
+                    "AttackSpeed": 1.0,
                     "Frames": 5,
                     "IdleFrame": 2,
                     "WalkFrameStart": 0,
@@ -88,7 +81,8 @@
                     "AttackFrameCount": 2,
                     "TexturePath": "enemy1.png"
                 }
-            ]
+            ],
+            "Message": "Now ain't that a surprise..."
         }
       ],
     "WaveIndex": 0,

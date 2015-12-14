@@ -20,6 +20,7 @@ namespace ProjectBowtie
 
 		public string Name;
 		public float Speed;
+		public float AttackSpeed;
 		public float BaseDamage;
 		public float DamageMultiplicator;
 		public float Health;

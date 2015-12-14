@@ -48,6 +48,7 @@ namespace ProjectBowtie
 
 		public void Initialize () {
 			ActiveWave = Waves [WaveIndex];
+			ActiveWave.Index = 1;
 		}
 
 		public void UpdateWaveEnemyPathing (Vector2 PlayerPositionOrigin) {
@@ -81,6 +82,7 @@ namespace ProjectBowtie
 				if (WaveIndex < Waves.Count) {
 					this.Log ("Loading next wave");
 					ActiveWave = Waves [WaveIndex];
+					ActiveWave.Index = WaveIndex + 1;
 				}
 			}
 		}

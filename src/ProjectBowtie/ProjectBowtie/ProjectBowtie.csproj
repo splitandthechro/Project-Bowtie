@@ -76,6 +76,7 @@
     <Compile Include="LivingEntity.cs" />
     <Compile Include="EnemyConfigurationHandler.cs" />
     <Compile Include="StatCalculator.cs" />
+    <Compile Include="UIScenes\DeathScreen.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
